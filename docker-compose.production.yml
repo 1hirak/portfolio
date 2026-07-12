@@ -26,7 +26,54 @@ services:
     networks:
       - portfolio-net
 
+  cms:
+    build: ./apps/cms
+    image: portfolio-cms
+    container_name: portfolio-cms
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1337:1337"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 1337
+      PUBLIC_URL: ${PUBLIC_URL:-https://api.portfolio.hirak.tech}
+      APP_KEYS: ${APP_KEYS}
+      API_TOKEN_SALT: ${API_TOKEN_SALT}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${DATABASE_NAME:-portfolio}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:-portfolio}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_SSL: "false"
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      S3_BUCKET: ${S3_BUCKET:-portfolio-hirak-tech-873461661529}
+      S3_UPLOAD_PATH: ${S3_UPLOAD_PATH:-media}
+      CDN_URL: ${CDN_URL}
+      FRONTEND_URL: ${FRONTEND_URL:-https://portfolio.hirak.tech}
+      READ_ONLY_API_TOKEN: ${STRAPI_API_TOKEN}
+      PREVIEW_API_TOKEN: ${STRAPI_PREVIEW_TOKEN}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1337/_health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    networks:
+      - portfolio-net
+
   web:
+    build: ./apps/web
     image: portfolio-web
     container_name: portfolio-web
     restart: unless-stopped
@@ -38,12 +85,15 @@ services:
       NODE_ENV: production
       HOSTNAME: 0.0.0.0
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://portfolio.hirak.tech}
-      STRAPI_INTERNAL_URL: http://host.docker.internal:1337
+      STRAPI_INTERNAL_URL: http://cms:1337
       NEXT_PUBLIC_STRAPI_URL: ${NEXT_PUBLIC_STRAPI_URL:-https://api.portfolio.hirak.tech}
       STRAPI_API_TOKEN: ${STRAPI_API_TOKEN}
       STRAPI_PREVIEW_TOKEN: ${STRAPI_PREVIEW_TOKEN}
       PREVIEW_SECRET: ${PREVIEW_SECRET}
       REVALIDATION_SECRET: ${REVALIDATION_SECRET}
+    depends_on:
+      cms:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
       interval: 30s

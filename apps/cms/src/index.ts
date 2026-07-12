@@ -1,4 +1,6 @@
 import { Strapi } from '@strapi/strapi';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const seedStrapi = require('../database/seed');
 
 function wrapAttributes(obj: any, depth = 0): any {
   if (depth > 5) return obj;
@@ -101,6 +103,14 @@ export default {
         });
         console.log('Preview API token created');
       }
+    }
+
+    console.log('Bootstrap: running seed...');
+    try {
+      const count = await seedStrapi(strapi);
+      console.log(`Bootstrap: seed complete, ${count} new items created`);
+    } catch (err) {
+      console.error('Bootstrap: seed failed', err);
     }
 
     console.log('Bootstrap complete');

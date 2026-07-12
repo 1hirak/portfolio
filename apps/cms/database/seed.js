@@ -1,8 +1,5 @@
-const strapi = require('@strapi/strapi');
-
-async function seed() {
-  const app = await strapi().load();
-  const entityService = app.entityService;
+async function seedStrapi(strapi) {
+  const entityService = strapi.entityService;
   let count = 0;
 
   function idempotent(api, checkFn, createFn) {
@@ -874,12 +871,17 @@ type ButtonProps = {
   return count;
 }
 
-seed()
-  .then((count) => {
-    console.log(`\nSeed complete! ${count} new items created.`);
-    process.exit(0);
-  })
-  .catch((err) => {
-    console.error('Seed failed:', err);
-    process.exit(1);
-  });
+module.exports = seedStrapi;
+
+if (require.main === module) {
+  const Strapi = require('@strapi/strapi');
+  Strapi().load().then((app) => seedStrapi(app))
+    .then((count) => {
+      console.log(`\nSeed complete! ${count} new items created.`);
+      process.exit(0);
+    })
+    .catch((err) => {
+      console.error('Seed failed:', err);
+      process.exit(1);
+    });
+}

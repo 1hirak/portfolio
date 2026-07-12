@@ -29,6 +29,15 @@ if [ -d .git ]; then
   git pull --ff-only origin main || echo "Warning: git pull failed, continuing with local code"
 fi
 
+# Stop any non-Docker process on port 1337 (legacy host Strapi)
+echo "Freeing port 1337..."
+PORT_PID=$(sudo lsof -ti :1337 2>/dev/null || true)
+if [ -n "$PORT_PID" ]; then
+  echo "Killing PID $PORT_PID on port 1337"
+  sudo kill "$PORT_PID" 2>/dev/null || true
+  sleep 3
+fi
+
 # Build and start
 echo "Building and starting containers..."
 docker compose -f docker-compose.production.yml build --pull

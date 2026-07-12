@@ -16,6 +16,7 @@ COPY --from=builder --chown=strapi:strapi /app/config ./config
 COPY --from=builder --chown=strapi:strapi /app/src ./src
 COPY --from=builder --chown=strapi:strapi /app/node_modules ./node_modules
 COPY --from=builder --chown=strapi:strapi /app/package.json ./
+COPY --from=builder --chown=strapi:strapi /app/database ./database
 COPY --from=builder --chown=strapi:strapi /app/.npmrc ./
 RUN mkdir -p /app/database/migrations /app/public/uploads && chown -R strapi:strapi /app
 
