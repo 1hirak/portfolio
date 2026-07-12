@@ -27,4 +27,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
 
 USER strapi
 ENV NODE_ENV=production
-CMD ["node", "node_modules/.bin/strapi", "start"]
+CMD ["npm", "start"]
