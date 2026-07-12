@@ -874,8 +874,8 @@ type ButtonProps = {
 module.exports = seedStrapi;
 
 if (require.main === module) {
-  const Strapi = require('@strapi/strapi');
-  Strapi().load().then((app) => seedStrapi(app))
+  const { createStrapi } = require('@strapi/strapi');
+  createStrapi().load().then((app) => seedStrapi(app))
     .then((count) => {
       console.log(`\nSeed complete! ${count} new items created.`);
       process.exit(0);

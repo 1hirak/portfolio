@@ -60,6 +60,9 @@ jobs:
             cd ${{ env.EC2_DEPLOY_PATH }}
             ECR_REGISTRY="${{ env.ECR_REGISTRY }}"
 
+            # Install AWS CLI if missing
+            command -v aws &>/dev/null || sudo snap install aws-cli --classic 2>/dev/null || true
+
             cat > .env.production << 'ENVEOF'
             DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
             APP_KEYS=${{ secrets.APP_KEYS }}
