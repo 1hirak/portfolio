@@ -39,75 +39,13 @@ module.exports = {
   },
 
   async bootstrap({ strapi }) {
-    const env = process.env;
-
-    const adminEmail = env.ADMIN_EMAIL || 'admin@portfolio.hirak.tech';
-    const adminPassword = env.ADMIN_PASSWORD || 'Admin123!';
-    const adminFirstname = env.ADMIN_FIRSTNAME || 'Admin';
-    const adminLastname = env.ADMIN_LASTNAME || 'User';
-
-    const existingAdmin = await strapi.db.query('admin::user').findOne({
-      where: { email: adminEmail },
-    });
-
-    if (!existingAdmin) {
-      await strapi.admin.services.user.create({
-        email: adminEmail,
-        password: adminPassword,
-        firstname: adminFirstname,
-        lastname: adminLastname,
-        isActive: true,
-        roles: [1],
-      });
-      console.log('Admin user created:', adminEmail);
-    }
-
-    const readOnlyToken = env.READ_ONLY_API_TOKEN;
-    const previewToken = env.PREVIEW_API_TOKEN;
-
-    if (readOnlyToken) {
-      const existingReadToken = await strapi.db.query('admin::api-token').findOne({
-        where: { name: 'Public Read-Only' },
-      });
-      if (!existingReadToken) {
-        await strapi.admin.services['api-tokens'].create({
-          name: 'Public Read-Only',
-          description: 'Read-only access for public content',
-          type: 'read-only',
-          accessKey: readOnlyToken,
-        });
-        console.log('Read-only API token created');
-      }
-    }
-
-    if (previewToken) {
-      const existingPreviewToken = await strapi.db.query('admin::api-token').findOne({
-        where: { name: 'Preview' },
-      });
-      if (!existingPreviewToken) {
-        await strapi.admin.services['api-tokens'].create({
-          name: 'Preview',
-          description: 'Access to draft/preview content',
-          type: 'custom',
-          permissions: [
-            { action: 'api::article.article.find' },
-            { action: 'api::article.article.findOne' },
-            { action: 'api::project.project.find' },
-            { action: 'api::project.project.findOne' },
-          ],
-          accessKey: previewToken,
-        });
-        console.log('Preview API token created');
-      }
-    }
-
     console.log('Bootstrap: running seed...');
     try {
       const seedStrapi = require('../database/seed');
       const count = await seedStrapi(strapi);
       console.log('Bootstrap: seed complete, ' + count + ' new items created');
     } catch (err) {
-      console.error('Bootstrap: seed failed', err?.message || err);
+      console.error('Bootstrap: seed failed', err?.message || err, err?.stack);
     }
 
     console.log('Bootstrap complete');
