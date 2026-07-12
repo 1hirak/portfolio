@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_sections_skills_sections",
+  "info": {
+    "displayName": "Skills Section",
+    "icon": "bulletList",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

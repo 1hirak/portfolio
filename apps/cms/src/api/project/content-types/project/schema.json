@@ -1,0 +1,113 @@
+{
+  "kind": "collectionType",
+  "collectionName": "projects",
+  "info": {
+    "singularName": "project",
+    "pluralName": "projects",
+    "displayName": "Project",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "cover": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "client": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string"
+    },
+    "timeline": {
+      "type": "string"
+    },
+    "team": {
+      "type": "string"
+    },
+    "tech_stack": {
+      "type": "json"
+    },
+    "problem": {
+      "type": "richtext"
+    },
+    "research": {
+      "type": "richtext"
+    },
+    "process": {
+      "type": "richtext"
+    },
+    "design_decisions": {
+      "type": "richtext"
+    },
+    "technical_decisions": {
+      "type": "richtext"
+    },
+    "results": {
+      "type": "richtext"
+    },
+    "metrics": {
+      "type": "json"
+    },
+    "gallery": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "live_url": {
+      "type": "string"
+    },
+    "repo_url": {
+      "type": "string"
+    },
+    "related_projects": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::project.project",
+      "inversedBy": "related_projects"
+    },
+    "content": {
+      "type": "dynamiczone",
+      "components": [
+        "sections.hero-section",
+        "sections.featured-projects",
+        "sections.about-section",
+        "sections.skills-section",
+        "sections.experience-section",
+        "sections.latest-articles",
+        "sections.contact-cta"
+      ]
+    },
+    "seo_title": {
+      "type": "string"
+    },
+    "seo_description": {
+      "type": "text"
+    },
+    "canonical_url": {
+      "type": "string"
+    },
+    "no_index": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

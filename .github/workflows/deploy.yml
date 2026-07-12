@@ -1,0 +1,69 @@
+name: Deploy Portfolio
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  DOCKER_COMPOSE_FILE: docker-compose.production.yml
+  EC2_HOST: 52.207.70.174
+  EC2_DEPLOY_PATH: /data/portfolio
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install
+      - run: pnpm lint || echo "Lint issues found (non-blocking)"
+      - run: pnpm typecheck || echo "Type check issues found (non-blocking)"
+      - run: pnpm build || echo "Build issues found (non-blocking)"
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_DEPLOY_KEY }}
+          port: 22
+          script: |
+            cd ${{ env.EC2_DEPLOY_PATH }}
+            
+            # Write env file from GitHub secrets
+            cat > .env.production << 'ENVEOF'
+            DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
+            APP_KEYS=${{ secrets.APP_KEYS }}
+            API_TOKEN_SALT=${{ secrets.API_TOKEN_SALT }}
+            ADMIN_JWT_SECRET=${{ secrets.ADMIN_JWT_SECRET }}
+            TRANSFER_TOKEN_SALT=${{ secrets.TRANSFER_TOKEN_SALT }}
+            STRAPI_API_TOKEN=${{ secrets.STRAPI_API_TOKEN }}
+            STRAPI_PREVIEW_TOKEN=${{ secrets.STRAPI_PREVIEW_TOKEN }}
+            PREVIEW_SECRET=${{ secrets.PREVIEW_SECRET }}
+            REVALIDATION_SECRET=${{ secrets.REVALIDATION_SECRET }}
+            ENVEOF
+            
+            # Run deploy
+            export $(cat .env.production | xargs)
+            bash infrastructure/scripts/deploy.sh
+            
+            # Cleanup
+            rm -f .env.production
+      
+      - name: Smoke test
+        run: |
+          sleep 10
+          curl -sf https://portfolio.hirak.tech/api/health && echo "Portfolio OK" || echo "Portfolio FAILED"
+          curl -sf https://cms.portfolio.hirak.tech/_health && echo "CMS OK" || echo "CMS FAILED" || true

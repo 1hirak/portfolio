@@ -1,0 +1,67 @@
+{
+  "kind": "singleType",
+  "collectionName": "homepages",
+  "info": {
+    "singularName": "homepage",
+    "pluralName": "homepages",
+    "displayName": "Homepage",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "hero": {
+      "type": "component",
+      "repeatable": false,
+      "component": "sections.hero-section"
+    },
+    "about": {
+      "type": "component",
+      "repeatable": false,
+      "component": "sections.about-section"
+    },
+    "skills": {
+      "type": "component",
+      "repeatable": false,
+      "component": "sections.skills-section"
+    },
+    "experience": {
+      "type": "component",
+      "repeatable": false,
+      "component": "sections.experience-section"
+    },
+    "featuredProjects": {
+      "type": "component",
+      "repeatable": false,
+      "component": "sections.featured-projects"
+    },
+    "latestArticles": {
+      "type": "component",
+      "repeatable": false,
+      "component": "sections.latest-articles"
+    },
+    "contactCta": {
+      "type": "component",
+      "repeatable": false,
+      "component": "sections.contact-cta"
+    },
+    "seo": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.seo"
+    },
+    "sections": {
+      "type": "dynamiczone",
+      "components": [
+        "sections.featured-projects",
+        "sections.about-section",
+        "sections.skills-section",
+        "sections.experience-section",
+        "sections.latest-articles",
+        "sections.contact-cta"
+      ]
+    }
+  }
+}

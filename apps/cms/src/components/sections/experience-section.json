@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_sections_experience_sections",
+  "info": {
+    "displayName": "Experience Section",
+    "icon": "clock",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

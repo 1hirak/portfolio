@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_sections_featured_projects",
+  "info": {
+    "displayName": "Featured Projects",
+    "icon": "grid",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "projects": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::project.project"
+    }
+  }
+}

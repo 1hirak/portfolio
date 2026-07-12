@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "skills",
+  "info": {
+    "singularName": "skill",
+    "pluralName": "skills",
+    "displayName": "Skill",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": ["frontend", "backend", "devops", "design", "tool", "other"]
+    },
+    "proficiency": {
+      "type": "integer",
+      "min": 0,
+      "max": 100
+    },
+    "icon": {
+      "type": "string"
+    },
+    "order": {
+      "type": "integer"
+    },
+    "skill_categories": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::skill-category.skill-category",
+      "inversedBy": "skills"
+    }
+  }
+}

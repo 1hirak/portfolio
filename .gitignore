@@ -1,0 +1,15 @@
+node_modules/
+.next/
+dist/
+.env
+.env.local
+.env.production
+*.pem
+*.key
+.DS_Store
+*.bak
+*.tsbuildinfo
+.cache/
+.vite/
+strapi/
+sam experiment/

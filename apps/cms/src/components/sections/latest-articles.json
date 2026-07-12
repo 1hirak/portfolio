@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_sections_latest_articles",
+  "info": {
+    "displayName": "Latest Articles",
+    "icon": "write",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "count": {
+      "type": "integer",
+      "default": 3
+    }
+  }
+}

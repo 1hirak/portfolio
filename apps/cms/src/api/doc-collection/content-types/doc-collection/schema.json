@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "doc_collections",
+  "info": {
+    "singularName": "doc-collection",
+    "pluralName": "doc-collections",
+    "displayName": "Doc Collection",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "order": {
+      "type": "integer"
+    },
+    "articles": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::article.article",
+      "mappedBy": "doc_collection"
+    }
+  }
+}

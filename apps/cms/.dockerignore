@@ -1,0 +1,9 @@
+node_modules
+build
+dist
+.cache
+.git
+*.md
+.env
+.env.*
+tests
