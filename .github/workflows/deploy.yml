@@ -6,34 +6,52 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_COMPOSE_FILE: docker-compose.production.yml
-  EC2_HOST: 52.207.70.174
+  EC2_HOST: 54.82.73.4
   EC2_DEPLOY_PATH: /data/portfolio
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: 873461661529.dkr.ecr.us-east-1.amazonaws.com
 
 jobs:
-  test:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          version: 9
-      - uses: actions/setup-node@v4
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push CMS
+        uses: docker/build-push-action@v6
         with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install
-      - run: pnpm lint || echo "Lint issues found (non-blocking)"
-      - run: pnpm typecheck || echo "Type check issues found (non-blocking)"
-      - run: pnpm build || echo "Build issues found (non-blocking)"
+          context: ./apps/cms
+          push: true
+          tags: ${{ env.ECR_REGISTRY }}/portfolio-cms:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push Web
+        uses: docker/build-push-action@v6
+        with:
+          context: ./apps/web
+          push: true
+          tags: ${{ env.ECR_REGISTRY }}/portfolio-web:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   deploy:
-    needs: test
+    needs: build-and-push
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -41,10 +59,10 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_DEPLOY_KEY }}
           port: 22
+          command_timeout: 15m
           script: |
             cd ${{ env.EC2_DEPLOY_PATH }}
-            
-            # Write env file from GitHub secrets
+
             cat > .env.production << 'ENVEOF'
             DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
             APP_KEYS=${{ secrets.APP_KEYS }}
@@ -55,17 +73,30 @@ jobs:
             STRAPI_PREVIEW_TOKEN=${{ secrets.STRAPI_PREVIEW_TOKEN }}
             PREVIEW_SECRET=${{ secrets.PREVIEW_SECRET }}
             REVALIDATION_SECRET=${{ secrets.REVALIDATION_SECRET }}
+            AWS_REGION=us-east-1
+            NEXT_PUBLIC_SITE_URL=https://portfolio.hirak.tech
+            NEXT_PUBLIC_STRAPI_URL=https://api.portfolio.hirak.tech
+            PUBLIC_URL=https://api.portfolio.hirak.tech
+            DATABASE_HOST=postgres
+            DATABASE_PORT=5432
+            DATABASE_NAME=portfolio
+            DATABASE_USERNAME=portfolio
+            AWS_BUCKET=portfolio-hirak-tech-873461661529
+            S3_BUCKET=portfolio-hirak-tech-873461661529
+            CDN_URL=https://portfolio-hirak-tech-873461661529.s3.us-east-1.amazonaws.com
+            FRONTEND_URL=https://portfolio.hirak.tech
             ENVEOF
-            
-            # Run deploy
-            export $(cat .env.production | xargs)
-            bash infrastructure/scripts/deploy.sh
-            
-            # Cleanup
+
+            set -a; source .env.production; set +a
+            git pull origin main
+
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+            docker compose -f docker-compose.production.yml pull
+            docker compose -f docker-compose.production.yml up -d --force-recreate
+
             rm -f .env.production
-      
+
       - name: Smoke test
         run: |
           sleep 10
           curl -sf https://portfolio.hirak.tech/api/health && echo "Portfolio OK" || echo "Portfolio FAILED"
-          curl -sf https://cms.portfolio.hirak.tech/_health && echo "CMS OK" || echo "CMS FAILED" || true
