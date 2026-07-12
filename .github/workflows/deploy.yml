@@ -33,8 +33,6 @@ jobs:
           context: ./apps/cms
           push: true
           tags: ${{ env.ECR_REGISTRY }}/portfolio-cms:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Build and push Web
         uses: docker/build-push-action@v6
@@ -42,8 +40,6 @@ jobs:
           context: ./apps/web
           push: true
           tags: ${{ env.ECR_REGISTRY }}/portfolio-web:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   deploy:
     needs: build-and-push
@@ -62,6 +58,7 @@ jobs:
           command_timeout: 15m
           script: |
             cd ${{ env.EC2_DEPLOY_PATH }}
+            ECR_REGISTRY="${{ env.ECR_REGISTRY }}"
 
             cat > .env.production << 'ENVEOF'
             DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
