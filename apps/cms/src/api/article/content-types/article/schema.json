@@ -37,20 +37,17 @@
     "author": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::author.author",
-      "mappedBy": "articles"
+      "target": "api::author.author"
     },
     "category": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::category.category",
-      "mappedBy": "articles"
+      "target": "api::category.category"
     },
     "tags": {
       "type": "relation",
       "relation": "manyToMany",
-      "target": "api::tag.tag",
-      "mappedBy": "articles"
+      "target": "api::tag.tag"
     },
     "featured": {
       "type": "boolean",
@@ -72,14 +69,12 @@
     "doc_collection": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::doc-collection.doc-collection",
-      "mappedBy": "articles"
+      "target": "api::doc-collection.doc-collection"
     },
     "doc_parent": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::article.article",
-      "mappedBy": "children"
+      "target": "api::article.article"
     },
     "children": {
       "type": "relation",
@@ -99,8 +94,7 @@
     "related_articles": {
       "type": "relation",
       "relation": "manyToMany",
-      "target": "api::article.article",
-      "mappedBy": "related_articles"
+      "target": "api::article.article"
     },
     "reading_time": {
       "type": "integer"

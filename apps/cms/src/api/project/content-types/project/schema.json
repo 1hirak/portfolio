@@ -81,8 +81,7 @@
     "related_projects": {
       "type": "relation",
       "relation": "manyToMany",
-      "target": "api::project.project",
-      "mappedBy": "related_projects"
+      "target": "api::project.project"
     },
     "content": {
       "type": "dynamiczone",
