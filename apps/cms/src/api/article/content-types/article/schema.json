@@ -38,19 +38,19 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::author.author",
-      "inversedBy": "articles"
+      "mappedBy": "articles"
     },
     "category": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::category.category",
-      "inversedBy": "articles"
+      "mappedBy": "articles"
     },
     "tags": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::tag.tag",
-      "inversedBy": "articles"
+      "mappedBy": "articles"
     },
     "featured": {
       "type": "boolean",
@@ -73,13 +73,13 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::doc-collection.doc-collection",
-      "inversedBy": "articles"
+      "mappedBy": "articles"
     },
     "doc_parent": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::article.article",
-      "inversedBy": "children"
+      "mappedBy": "children"
     },
     "children": {
       "type": "relation",
@@ -100,7 +100,7 @@
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::article.article",
-      "inversedBy": "related_articles"
+      "mappedBy": "related_articles"
     },
     "reading_time": {
       "type": "integer"

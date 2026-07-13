@@ -82,7 +82,7 @@
       "type": "relation",
       "relation": "manyToMany",
       "target": "api::project.project",
-      "inversedBy": "related_projects"
+      "mappedBy": "related_projects"
     },
     "content": {
       "type": "dynamiczone",

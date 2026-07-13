@@ -58,10 +58,12 @@ jobs:
           command_timeout: 15m
           script: |
             cd ${{ env.EC2_DEPLOY_PATH }}
-            ECR_REGISTRY="${{ env.ECR_REGISTRY }}"
+            export ECR_REGISTRY="${{ env.ECR_REGISTRY }}"
 
             # Install AWS CLI if missing
-            command -v aws &>/dev/null || sudo snap install aws-cli --classic 2>/dev/null || true
+            if ! command -v aws &>/dev/null; then
+              sudo apt-get update -qq && sudo apt-get install -y -qq awscli
+            fi
 
             cat > .env.production << 'ENVEOF'
             DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
@@ -87,12 +89,11 @@ jobs:
             FRONTEND_URL=https://portfolio.hirak.tech
             ENVEOF
 
-            set -a; source .env.production; set +a
             git pull origin main
 
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$ECR_REGISTRY"
-            docker compose -f docker-compose.production.yml pull
-            docker compose -f docker-compose.production.yml up -d --force-recreate
+            docker compose --env-file .env.production -f docker-compose.production.yml pull
+            docker compose --env-file .env.production -f docker-compose.production.yml up -d --force-recreate
 
             rm -f .env.production
 

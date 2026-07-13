@@ -17,19 +17,24 @@ async function seedStrapi(strapi) {
   }
 
   function p(text) {
-    return [{ type: 'paragraph', children: [{ type: 'text', text: text.trim() }] }];
+    return text.trim();
   }
 
   function multiP(...texts) {
-    return texts.map(t => ({ type: 'paragraph', children: [{ type: 'text', text: t.trim() }] }));
+    return texts.map(t => t.trim()).join('\n\n');
   }
 
   function heading(level, text) {
-    return { type: 'heading', level, children: [{ type: 'text', text: text.trim() }] };
+    const prefix = '#'.repeat(level);
+    return prefix + ' ' + text.trim();
   }
 
   function code(language, text) {
-    return { type: 'code', children: [{ type: 'text', text: text.trim() }], language };
+    return '```' + language + '\n' + text.trim() + '\n```';
+  }
+
+  function joinContent(blocks) {
+    return blocks.join('\n\n');
   }
 
   // ============================================================
@@ -336,7 +341,7 @@ async function seedStrapi(strapi) {
       title: 'Building a Real-Time Dashboard with Next.js and WebSockets',
       slug: 'building-realtime-dashboard-nextjs-websockets',
       description: 'Learn how to build a real-time analytics dashboard using Next.js 15, WebSockets, and TimescaleDB.',
-      content: [
+      content: joinContent([
         heading(2, 'Introduction'),
         p('Real-time dashboards are everywhere — from monitoring tools to live analytics. In this guide, I\'ll walk you through building a performant real-time dashboard using Next.js 15, WebSocket connections, and TimescaleDB for time-series data.'),
         heading(2, 'Architecture Overview'),
@@ -379,7 +384,7 @@ export function useMetricStream(channel: string) {
         p('With thousands of events per second, the browser can become a bottleneck. We used virtualized lists, data aggregation at the server level, and throttled re-renders with requestAnimationFrame to keep the UI snappy.'),
         heading(2, 'Conclusion'),
         p('Building a real-time dashboard is a rewarding challenge that touches on full-stack engineering skills. The combination of Next.js for the shell, WebSockets for live data, and TimescaleDB for time-series storage creates a robust foundation.'),
-      ],
+      ]),
       category: categories.engineering.id,
       tags: { connect: [tags.nextjs.id, tags.typescript.id, tags.nodejs.id, tags.docker.id] },
       featured: true,
@@ -392,7 +397,7 @@ export function useMetricStream(channel: string) {
       title: 'The Complete Guide to Docker for JavaScript Developers',
       slug: 'complete-guide-docker-javascript-developers',
       description: 'Everything you need to know about Docker — from containers to docker-compose and production deployments.',
-      content: [
+      content: joinContent([
         heading(2, 'Why Docker?'),
         p('"It works on my machine" — we\'ve all heard it. Docker solves this by packaging your application with all its dependencies into a standardized unit called a container.'),
         heading(2, 'Dockerfile Basics'),
@@ -447,7 +452,7 @@ volumes:
         p('In production: use .dockerignore to exclude unnecessary files, pin image versions, never run as root (we use USER nextjs), use healthchecks, and set resource limits in your compose file.'),
         heading(2, 'Conclusion'),
         p('Docker is an essential skill for modern JavaScript developers. Start with a simple Dockerfile, add docker-compose for local development, and incrementally adopt production best practices.'),
-      ],
+      ]),
       category: categories.devops.id,
       tags: { connect: [tags.docker.id, tags.nodejs.id, tags.aws.id] },
       featured: true,
@@ -460,7 +465,7 @@ volumes:
       title: 'TypeScript Patterns for Scalable React Applications',
       slug: 'typescript-patterns-scalable-react',
       description: 'Production-proven TypeScript patterns for type-safe API clients, discriminated unions, and generic React hooks.',
-      content: [
+      content: joinContent([
         heading(2, 'Why TypeScript Patterns Matter'),
         p('TypeScript catches bugs at compile time, but only if you use it well. Poorly typed code is just JavaScript with extra annotations. Here are patterns I\'ve refined over years of React development.'),
         heading(2, 'Discriminated Unions for Async State'),
@@ -504,7 +509,7 @@ type ButtonProps = {
 `),
         heading(2, 'Conclusion'),
         p('These patterns have saved me countless hours debugging runtime errors. The key is leveraging TypeScript\'s type system to encode business logic at the type level, making invalid states unrepresentable.'),
-      ],
+      ]),
       category: categories.frontend.id,
       tags: { connect: [tags.react.id, tags.typescript.id, tags.nextjs.id] },
       featured: false,
@@ -517,7 +522,7 @@ type ButtonProps = {
       title: 'From Monolith to Microservices: A Migration Playbook',
       slug: 'monolith-to-microservices-migration-playbook',
       description: 'A practical guide to decomposing a monolithic application into microservices without losing your sanity.',
-      content: [
+      content: joinContent([
         heading(2, 'The Decision'),
         p('Not every monolith needs to be broken up. Microservices add operational complexity. But when your monolith is 500K lines, has a 45-minute deploy time, and teams keep stepping on each other\'s toes, it\'s time to consider migration.'),
         heading(2, 'The Strangler Fig Pattern'),
@@ -530,7 +535,7 @@ type ButtonProps = {
         p('Start with the simplest, most independent service. We chose Notifications — it had few dependencies and low risk. Successful extraction in 3 weeks gave the team confidence.'),
         heading(2, 'Lessons Learned'),
         p('Key takeaways: 1) Invest in monitoring first (you\'ll need it), 2) Keep the monolith working during migration (dual-write pattern), 3) Don\'t extract services that aren\'t independent, 4) Migration takes 3-4x longer than you expect.'),
-      ],
+      ]),
       category: categories.engineering.id,
       tags: { connect: [tags.nodejs.id, tags.aws.id, tags.docker.id] },
       featured: false,
@@ -543,7 +548,7 @@ type ButtonProps = {
       title: 'Getting Started with AWS for Web Developers',
       slug: 'getting-started-aws-web-developers',
       description: 'A practical introduction to AWS services every web developer should know: EC2, S3, RDS, and CloudFront.',
-      content: [
+      content: joinContent([
         heading(2, 'AWS is Not Scary'),
         p('AWS has 200+ services, but as a web developer, you only need to know a handful: EC2 (servers), S3 (file storage), RDS (databases), and CloudFront (CDN).'),
         heading(2, 'EC2: Virtual Servers'),
@@ -554,7 +559,7 @@ type ButtonProps = {
         p('RDS manages PostgreSQL, MySQL, or Aurora for you. Automated backups, multi-AZ failover, and read replicas. One click compared to managing Postgres yourself on EC2.'),
         heading(2, 'Putting It Together'),
         p('A typical web app: EC2 for your Next.js/Node server, RDS for PostgreSQL, S3 for user uploads and backups, CloudFront as CDN, and Route 53 for DNS. All managed by IAM for permissions.'),
-      ],
+      ]),
       category: categories.devops.id,
       tags: { connect: [tags.aws.id, tags.docker.id, tags.nodejs.id] },
       featured: false,
@@ -595,7 +600,7 @@ type ButtonProps = {
     () => entityService.create('api::article.article', { data: {
       title: 'Getting Started', slug: 'getting-started',
       description: 'Set up your development environment and start contributing.',
-      content: [
+      content: joinContent([
         heading(2, 'Prerequisites'),
         p('Before you begin, make sure you have the following installed on your machine: Node.js 18+, pnpm 9+, Docker Desktop, and Git.'),
         heading(2, 'Clone and Install'),
@@ -606,7 +611,7 @@ type ButtonProps = {
         code('bash', 'docker compose up -d\npnpm dev'),
         heading(2, 'Access the Apps'),
         p('Once running, access the Next.js frontend at http://localhost:3000 and the Strapi admin panel at http://localhost:1337/admin. Default admin credentials are set in the environment variables.'),
-      ],
+      ]),
       doc_collection: docColl.id,
       nav_order: 1,
       author: author.id,
@@ -620,7 +625,7 @@ type ButtonProps = {
     () => entityService.create('api::article.article', { data: {
       title: 'Architecture Overview', slug: 'architecture-overview',
       description: 'Understanding the system architecture, data flow, and technology choices.',
-      content: [
+      content: joinContent([
         heading(2, 'High-Level Architecture'),
         p('The portfolio is a pnpm monorepo with two applications: a Strapi v5 headless CMS and a Next.js 15 frontend, deployed on a single AWS EC2 instance with Docker Compose.'),
         heading(2, 'Component Diagram'),
@@ -629,7 +634,7 @@ type ButtonProps = {
         p('Frontend: Next.js 15 (App Router), TypeScript, Tailwind CSS, Radix UI primitives. Backend/CMS: Strapi v5, PostgreSQL 16, AWS S3 for media. Infrastructure: Nginx reverse proxy, Let\'s Encrypt TLS, docker-compose, GitHub Actions CI/CD.'),
         heading(2, 'Data Flow'),
         p('1. Content editors create/manage content in Strapi admin. 2. Next.js server components fetch data from Strapi REST API at request time (ISR with 60s revalidation). 3. Media files are uploaded to S3 and served via CloudFront CDN. 4. On-demand revalidation via Strapi webhook triggering Next.js API route.'),
-      ],
+      ]),
       doc_collection: docColl.id,
       nav_order: 2,
       author: author.id,
@@ -643,7 +648,7 @@ type ButtonProps = {
     () => entityService.create('api::article.article', { data: {
       title: 'API Reference', slug: 'api-reference',
       description: 'Complete reference for all Strapi API endpoints used by the portfolio.',
-      content: [
+      content: joinContent([
         heading(2, 'REST API Endpoints'),
         heading(3, 'Articles'),
         code('text', 'GET /api/articles - List articles (pagination, filters, sort)\nGET /api/articles?filters[slug][$eq]=:slug - Get single article\nGET /api/articles?filters[featured][$eq]=true - Featured articles\nGET /api/articles?filters[category][slug][$eq]=:cat - By category\nGET /api/articles?filters[tags][slug][$eq]=:tag - By tag'),
@@ -657,7 +662,7 @@ type ButtonProps = {
         p('Public endpoints use a read-only API token passed as Bearer token in the Authorization header. Admin operations require JWT authentication through the Strapi admin panel.'),
         heading(2, 'Response Format'),
         p('All responses use the Strapi v4-compatible format: { data: { id, attributes: {...} }, meta: { pagination: {...} } }. This is achieved via a custom response transformation middleware in the CMS.'),
-      ],
+      ]),
       doc_collection: docColl.id,
       nav_order: 3,
       author: author.id,
@@ -671,7 +676,7 @@ type ButtonProps = {
     () => entityService.create('api::article.article', { data: {
       title: 'Deployment Guide', slug: 'deployment-guide',
       description: 'How to deploy the portfolio to AWS EC2 with Docker and GitHub Actions.',
-      content: [
+      content: joinContent([
         heading(2, 'Prerequisites'),
         p('An AWS EC2 instance running Ubuntu 22.04, an S3 bucket for media/backups, DNS records pointing to the EC2 IP, and GitHub secrets configured for CI/CD.'),
         heading(2, 'Initial Server Setup'),
@@ -682,7 +687,7 @@ type ButtonProps = {
         p('Push to main triggers the deploy workflow: SSH into EC2, pull latest code, rebuild containers with docker compose, and run health checks. The entire deploy takes ~2 minutes with zero downtime.'),
         heading(2, 'Monitoring'),
         p('Use the monitor.sh script for health checks. Daily PostgreSQL backups to S3 via systemd timer. Nginx access logs for traffic analysis.'),
-      ],
+      ]),
       doc_collection: docColl.id,
       nav_order: 4,
       author: author.id,
@@ -696,7 +701,7 @@ type ButtonProps = {
     () => entityService.create('api::article.article', { data: {
       title: 'FAQ', slug: 'frequently-asked-questions',
       description: 'Common questions about the portfolio platform.',
-      content: [
+      content: joinContent([
         heading(2, 'How do I add a new blog post?'),
         p('Log in to the Strapi admin panel, navigate to the Articles collection, and click "Create new entry." Fill in the title, slug, description, content (using the rich text editor), and assign a category and tags. Set "publishedAt" to make it visible.'),
         heading(2, 'How do I add a new project?'),
@@ -707,7 +712,7 @@ type ButtonProps = {
         p('Images uploaded through Strapi are stored in AWS S3 and served via the S3 URL. The Next.js frontend is configured to allow images from the S3 bucket domain.'),
         heading(2, 'Can I self-host this without AWS?'),
         p('Yes! Update the upload provider in config/plugins.js to use local storage instead of S3. The Docker Compose setup works on any Linux server with Docker installed.'),
-      ],
+      ]),
       doc_collection: docColl.id,
       nav_order: 5,
       author: author.id,
